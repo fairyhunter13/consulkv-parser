@@ -1,0 +1,10 @@
+version: "3"
+services:
+  consul:
+    image: consul
+    ports:
+      - "8500:8500"
+    volumes:
+      - "consul_volume:/consul/data"
+volumes:
+  consul_volume:
