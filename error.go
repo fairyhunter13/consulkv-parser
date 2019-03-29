@@ -11,4 +11,6 @@ var (
 	ErrUnhandledKind = errors.New("unhandled kind for assigning value to the field")
 	//ErrOverflowSet defines error that will be used for overflow case.
 	ErrOverflowSet = errors.New("error in set the overflowing value to the field")
+	//ErrEmptyLayout defines the error for empty layout given.
+	ErrEmptyLayout = errors.New("layout given is an empty string")
 )
