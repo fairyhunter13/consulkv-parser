@@ -278,3 +278,12 @@ func (parser *Parser) getValue(consulKey string) (value string, err error) {
 	value = string(pair.Value)
 	return
 }
+
+func (parser *Parser) SetTimeLayout(layout string) (err error) {
+	if layout == "" {
+		err = ErrEmptyLayout
+		return
+	}
+	timeLayout = layout
+	return
+}

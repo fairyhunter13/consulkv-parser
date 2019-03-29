@@ -1154,3 +1154,86 @@ func TestParser_Parse(t *testing.T) {
 		})
 	}
 }
+
+func TestParser_SetTimeLayout(t *testing.T) {
+	type fields struct {
+		consulKV func() *api.KV
+	}
+	type args struct {
+		layout func() string
+	}
+	type expects struct {
+		layout func() string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		expects expects
+		wantErr bool
+	}{
+		{
+			name: "time.RFC3339Nano Layout",
+			fields: fields{
+				consulKV: func() *api.KV {
+					client, err := api.NewClient(api.DefaultConfig())
+					if err != nil {
+						t.Errorf("Error starting the api client: %s", err)
+					}
+					return client.KV()
+				},
+			},
+			args: args{
+				layout: func() string {
+					return time.RFC3339Nano
+				},
+			},
+			expects: expects{
+				layout: func() string {
+					return time.RFC3339Nano
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Empty Layout",
+			fields: fields{
+				consulKV: func() *api.KV {
+					client, err := api.NewClient(api.DefaultConfig())
+					if err != nil {
+						t.Errorf("Error starting the api client: %s", err)
+					}
+					return client.KV()
+				},
+			},
+			args: args{
+				layout: func() string {
+					return ""
+				},
+			},
+			expects: expects{
+				layout: func() string {
+					return time.RFC3339
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				timeLayout = time.RFC3339
+			}()
+			parser := &Parser{
+				consulKV: tt.fields.consulKV(),
+			}
+			if err := parser.SetTimeLayout(tt.args.layout()); (err != nil) != tt.wantErr {
+				t.Errorf("Parser.Parse() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				assert.Equal(t, tt.expects.layout(), tt.args.layout())
+			}
+			assert.Equal(t, tt.expects.layout(), timeLayout)
+		})
+	}
+}
